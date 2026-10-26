@@ -199,6 +199,52 @@ plt.show()
 #   help.
 # * The radar helps the twin little. Section 4 shows why.
 #
+# ### Storm by storm: where does the merge win?
+# One score over ten storms hides how the storms differ. Below, the score of each storm on its
+# own, for link IDW, the static merge RCP and the links-only twin, plus each storm's share of
+# the gap between the twin and RCP in squared error (the sum that NRMSE is made of).
+
+# %%
+STORM_H = pd.Series(np.concatenate([np.full(st.size - SPIN, i) for i, st in enumerate(steps)]),
+                    index=HOURS).groupby(level=0).first().values
+per_storm = {"static C": c.product("C", scored)[:, GI[0], GI[1]],
+             "static RCP": c.product("RCP", scored)[:, GI[0], GI[1]],
+             "twin L (now map)": runs["L"]["now"]}
+per_storm = {k: hourly(v) for k, v in per_storm.items()}
+
+
+def storm_nrmse(Eh, s):
+    m = STORM_H == s
+    ok = np.isfinite(Eh[m]) & np.isfinite(GH[m])
+    return np.sqrt(np.mean((Eh[m][ok] - GH[m][ok]) ** 2)) / GH[m][ok].mean()
+
+
+def storm_sse(Eh, s):
+    m = STORM_H == s
+    return np.nansum((Eh[m] - GH[m]) ** 2)
+
+
+PS = pd.DataFrame({k: [storm_nrmse(v, s) for s in range(len(EVENTS))] for k, v in per_storm.items()},
+                  index=[n for n, _, _ in EVENTS])
+PS.insert(0, "hours", [int((STORM_H == s).sum()) for s in range(len(EVENTS))])
+gap = np.array([storm_sse(per_storm["twin L (now map)"], s) - storm_sse(per_storm["static RCP"], s)
+                for s in range(len(EVENTS))])
+PS["share of gap"] = gap / gap.sum()
+print(PS.round(2).to_string())
+print(f"\nRCP better than the twin in {(PS['static RCP'] < PS['twin L (now map)']).sum()} of {len(PS)} storms; "
+      f"the two largest shares of the gap add up to {np.sort(PS['share of gap'])[-2:].sum():.0%}")
+
+# %% [markdown]
+# * RCP is better than the twin in most storms, but in most of them only by a hair.
+# * Nearly 80 % of RCP's lead comes from **two storms**, 2 June and 28 July (about 30 hours
+#   each). They are neither the most intense (the end of August has higher rates) nor the
+#   longest (7 July lasts 41 hours and adds almost nothing to the gap). What sets them apart is
+#   an open question (exercise: map where RCP and the twin differ most in those two storms).
+# * So "the merge beats the twin" is mostly a statement about those two storms. With ten storms,
+#   one or two of them can decide the table; the bootstrap in `tools/extend_runs.py A` puts a
+#   95 % range of about 0.75 to 1.3 on every map's total score, while the *paired* difference
+#   twin minus RCP stays between about 0.0 and 0.11.
+#
 # ## 4. A smooth twin and a sharp radar
 # The radar has the structure the twin lacks, but the twin can only hold a smooth version of it.
 # On the heaviest hour of 28 July:

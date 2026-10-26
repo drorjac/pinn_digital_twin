@@ -3,6 +3,3 @@
 __pycache__/
 .ipynb_checkpoints/
 cache/
-.claude/
-CLAUDE.md
-CLAUDE.local.md

@@ -1,6 +1,6 @@
 # Digital Twins of Spatio-Temporal Fields: 1D → 2D, Beginner → Expert
 
-A hands-on course in 11 executed Jupyter notebooks: six chapters of course, then a five-chapter
+A hands-on course in 13 executed Jupyter notebooks: six chapters of course, then a seven-chapter
 project on real data. In the course you build digital twins of physical fields:
 a heated rod (1D) and a stirred contaminated tank (2D). You start from a 10-line finite-difference
 solver and finish with a twin that detects a hidden leak, locates it, forecasts what-if scenarios
@@ -42,10 +42,12 @@ city gauges that are only used for scoring. Data come from FieldSense's 5-minute
 | 10 | `10_rain_twin_system` | one twin, any mix of links / stations / radar. Its best map (NRMSE 1.05 at the gauges) beats every static map without radar, and loses to FieldSense's radar merge RCP (0.99). Radar enters best in log space, or as the base of a twin of the radar's *error*. The twin learns storm motion; its spread is far too narrow |
 | 11 | `11_distilling_the_twin` | knowledge distillation: a 2 ms U-Net that sees only links and stations, trained on the twin (which saw the radar). NRMSE 1.03 over three seeds: better than its teacher (1.06), than IDW of the same inputs (1.06) and than the same network trained on radar (1.67); steadier than one trained on the static merge (1.03 to 1.09). Its spread is about ten times too narrow |
 | 12 | `12_new_york_transfer` | the same twin and student, untuned, in New York in winter (26 links, 27 stations, MRMS radar, 4 airport gauges). The ranking flips: stations beat links, the radar alone beats the links, RCP is best again (0.43). The twin with all sensors ties IDW (0.58); links only, it fails (1.43) because the gauges are 4 to 14 km from any link. Distillation does not transfer: a twin that leans on a good radar is a poor teacher for a radar-free student (0.83), and RCP is the better teacher (0.51 to 0.60) |
+| 13 | `13_emilia_romagna` | the same twin in Emilia-Romagna (10 storms, about 130 links, 300 gauges 5 km apart, a radar 51 % high), hourly data, scored on FieldSense's 5-fold held-out gauges. It does not transfer: untuned, its best map (radar only, 2.02) barely beats the raw radar (2.21) and gauges or links make it worse. Two fixes (gauges observed in log space; a random walk on the radar's bias, which was frozen at its first estimate here and in ch 10 and 12) bring the full twin to 1.93, still behind gauge IDW (1.58) and FieldSense's KED (1.27) in every storm. At one step an hour, showers do not survive from step to step, and the twin is left as a weaker interpolator than kriging |
 
 The heavy runs of Part III are cached in `cache/` (teacher labels: `python tools/teacher_labels.py [openmrg|openmesh]`).
 Part III needs a FieldSense checkout with the `multisensor_nowcasting` cube built
-(`FIELDSENSE_DIR`).
+(`FIELDSENSE_DIR`). Chapter 13 reads FieldSense's `multisensor` merging inputs and scores for
+Emilia-Romagna instead, and its twin runs are cached by `python tools/italy_runs.py` (about 50 min on 4 processes).
 
 The twin itself is the package `raintwin/`. It has a link observation operator, a log-rain EnKF
 with the storm velocity in its state, IDW baselines, the hybrid map, the forecast blend and an OpenMRG loader. Chapter 7 needs a
@@ -69,6 +71,7 @@ raintwin/              the rain twin (Part II)
   core.py              link operator, IDW, RainTwin (EnKF with motion, extra sensor sets), ResidualBlend
   openmrg.py           OpenMRG loader on the radar grid, finer grids
   cube.py              FieldSense's 5-min multi-sensor cube (links, stations, radar, gauges)
+  openrainer.py        Emilia-Romagna storms from FieldSense's merging inputs, hourly, with its gauge folds
   system.py            the twin with any sensor mix, the radar-error twin, wet periods
   distill.py           student U-Net, training and prediction
 cache/                 cached runs of Part III
