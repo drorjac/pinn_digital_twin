@@ -7,16 +7,20 @@ from .core import RainTwin, smooth_noise
 # observation errors: links and stations std = abs + rel * value (mm/h); the radar observes
 # log(R + r0) directly, with a constant std in log units, and gets a learned bias
 ERRORS = {"L": (0.3, 0.15), "P": (0.5, 0.3), "R": (0.4, 0.0)}     # radar error in log units
+POINT_LOG_ERR = 0.3                                                 # stations observed in log units
 
 
-def build_twin(cube, sensors, radar_thin=2, seed=1, errors=None, radar_bias=None, radar_log=True, **kw):
+def build_twin(cube, sensors, radar_thin=2, seed=1, errors=None, radar_bias=None, radar_log=True,
+                point_log=False, **kw):
     """A RainTwin on the cube's grid observing the sensor letters in `sensors` (e.g. "LPR").
-    The links are always the first set; when L is not used their readings are passed as NaN."""
+    The links are always the first set; when L is not used their readings are passed as NaN.
+    point_log=True: the stations observe log(R + r0) like the radar, with error POINT_LOG_ERR."""
     E = dict(ERRORS, **(errors or {}))
     tw = RainTwin(cube.x, cube.y, cube.links, err_abs=E["L"][0], err_rel=E["L"][1],
                   seed=seed, **kw)
     if "P" in sensors:
-        tw.add_obs("P", cube.pws["x"], cube.pws["y"], cube.pws["x"], cube.pws["y"], *E["P"])
+        tw.add_obs("P", cube.pws["x"], cube.pws["y"], cube.pws["x"], cube.pws["y"],
+                   *((POINT_LOG_ERR, 0.0) if point_log else E["P"]), log=point_log)
     if "R" in sensors:
         ny, nx = cube.y.size, cube.x.size
         r, c = np.meshgrid(np.arange(0, ny, radar_thin), np.arange(0, nx, radar_thin), indexing="ij")
@@ -62,7 +66,7 @@ def run(cube, idx, sensors, keep=None, radius=3.0, **kw):
     out = {"mean": [], "spread": [], "now": [], "V": []}
     for j, k in enumerate(idx):
         if j:
-            tw.forecast(5 / 60)
+            tw.forecast(getattr(cube, "step_h", 5 / 60))
         y, extra = observe(tw, cube, k)
         tw.analysis(y, extra=extra)
         R = tw.rain
@@ -118,7 +122,7 @@ def run_error_twin(cube, idx, sensors="LP", radius=3.0, seed=1, errors=None, **k
     out = {"mean": [], "spread": [], "now": [], "V": [], "factor": []}
     for j, k in enumerate(idx):
         if j:
-            tw.forecast(5 / 60)
+            tw.forecast(getattr(cube, "step_h", 5 / 60))
         tw.set_radar(cube.radar([k])[0])
         y, extra = observe(tw, cube, k)
         tw.analysis(y, extra=extra)

@@ -133,7 +133,7 @@ class RainTwin:
     def __init__(self, x, y, links, n_members=40, loc_radius=15.0, inflation=1.03,
                  q_log=0.15, q_vel=0.5, tau_h=2.0, noise_cells=3.0, r0=0.1,
                  periodic=False, err_abs=0.3, err_rel=0.15, r_max=200.0, growth=False,
-                 q_growth=0.05, link_bias_gain=0.0, v_max=None, seed=0):
+                 q_growth=0.05, link_bias_gain=0.0, v_max=None, q_bias=0.0, seed=0):
         self.x, self.y = np.asarray(x, float), np.asarray(y, float)
         self.dx = self.x[1] - self.x[0]
         self.X, self.Y = np.meshgrid(self.x, self.y)
@@ -150,6 +150,7 @@ class RainTwin:
         self.rng = np.random.default_rng(seed)
         self.loc_radius = loc_radius
         self.growth, self.q_growth = growth, q_growth
+        self.q_bias = q_bias                       # random walk of sensor log-biases per 5 min
         # per-link offset [mm/h], learned as a slow running mean of what the map cannot explain
         self.link_bias_gain = link_bias_gain
         self.v_max = v_max                         # optional cap on each member's speed
@@ -218,6 +219,9 @@ class RainTwin:
             self.V = self.V + self.q_vel * f * self.rng.standard_normal(self.V.shape)
             if self.growth:
                 self.G = self.G + self.q_growth * f * self.rng.standard_normal(self.N)
+            if self.q_bias:
+                for k in self.B:
+                    self.B[k] = self.B[k] + self.q_bias * f * self.rng.standard_normal(self.N)
 
     def predict(self, n_steps, hours):
         """Forecast without model noise. Returns ensemble-mean rain (n_steps, ny, nx) and spread."""
