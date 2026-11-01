@@ -41,7 +41,7 @@ def set_style():
         "figure.dpi": 110, "savefig.dpi": 150, "figure.facecolor": SURFACE,
         "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
         "axes.edgecolor": MUTED, "axes.labelcolor": INK2, "axes.titlecolor": INK,
-        "axes.titlesize": 11, "axes.titleweight": "semibold", "axes.titlelocation": "left",
+        "axes.titlesize": 11, "axes.titleweight": "bold", "axes.titlelocation": "left",
         "axes.labelsize": 10, "axes.spines.top": False, "axes.spines.right": False,
         "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.8,
         "axes.prop_cycle": mpl.cycler(color=SERIES),
@@ -105,7 +105,7 @@ def snapshot_grid(fields, titles, L=1.0, ncols=None, cmap=FIELD, vmin=None, vmax
         ax.axis("off")
     fig.colorbar(im, ax=axes, label=label, fraction=0.025, pad=0.02)
     if suptitle:
-        fig.suptitle(suptitle, x=0.02, ha="left", fontweight="semibold")
+        fig.suptitle(suptitle, x=0.02, ha="left", fontweight="bold")
     return fig, axes
 
 

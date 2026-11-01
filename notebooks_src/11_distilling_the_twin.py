@@ -99,7 +99,7 @@ for ax, (F, ttl) in zip(axes, show):
     im = ax.imshow(F, origin="lower", cmap=viz.FIELD, vmin=0, vmax=vm, extent=ext)
     ax.set(title=ttl, xticks=[], yticks=[])
 plt.colorbar(im, ax=axes, shrink=0.8, label="mm/h")
-fig.suptitle(f"One training step: {c.times[idx[k_show]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"One training step: {c.times[idx[k_show]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "11_inputs_targets.png")
 plt.show()
 
@@ -226,18 +226,18 @@ plt.show()
 
 # %% [markdown]
 # **Reading the exam.**
-# * **Trained on the radar, the student is bad** (1.67, half the rain missing). It learns the
+# * **Trained on the radar, the student is bad** (1.63, half the rain missing). It learns the
 #   radar's level and the radar's misses. A learned link map is only as good as the map it is
 #   trained on.
-# * **Trained on the twin, the student scores 1.03** on all three seeds (1.025 to 1.035). That is
+# * **Trained on the twin, the student scores 1.02** over three seeds (1.00 to 1.03). That is
 #   better than IDW of the same inputs (1.06) and better than **its own teacher** (1.06). The
 #   student cannot copy the teacher's step-to-step noise, only what is predictable from links and
 #   stations, and that part turns out to be the better map at the gauges.
-# * **Trained on RCP, the student is about as good on its best seed (1.03) and less steady**:
-#   1.03 to 1.09 over the seeds, one of them 17 % wet. RCP is rebuilt from scratch every 5
-#   minutes and jumps where the radar jumps; the twin's targets change smoothly. The average gap
-#   between the two teachers (1.03 against 1.06) is small, and three seeds are not many, so read
-#   it as "at least as good and steadier", not as a clear win.
+# * **Trained on RCP, the student is about as good on its best seed (1.00) and a little less
+#   steady**: 1.00 to 1.05 over the seeds. RCP is rebuilt from scratch every 5 minutes and jumps
+#   where the radar jumps; the twin's targets change smoothly. The average gap between the two
+#   teachers (1.02 against 1.03) is small, and three seeds are not many, so read it as "at least
+#   as good and a little steadier", not as a clear win.
 # * The best static map, RCP, still wins (0.99). But it needs the radar at run time; the student
 #   does not.
 #
@@ -261,7 +261,7 @@ for ax, (F, ttl, cm) in zip(axes.ravel(), panels):
     ax.plot(c.gauges["x"], c.gauges["y"], "^", color=viz.BLUE, ms=5, mec="white")
     ax.set(title=ttl, xticks=[], yticks=[])
     plt.colorbar(im, ax=ax, shrink=0.75, label="mm/h")
-fig.suptitle(f"Test storm, {c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"Test storm, {c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "11_maps.png")
 plt.show()
 
@@ -300,8 +300,8 @@ print(f"the spread would need to be {scale:.1f} times larger for 95 % at k = 2")
 # ## Conclusions
 # * A twin is a good teacher. Distilled into a 2 ms network that sees only links and stations, it
 #   gives a better map at independent gauges than IDW of the same data and than a student trained
-#   on the radar, and a steadier one than a student trained on the static merge.
-# * The student beat its own teacher at the gauges (1.03 against 1.06): it keeps what is
+#   on the radar, and a slightly steadier one than a student trained on the static merge.
+# * The student beat its own teacher at the gauges (1.02 against 1.06): it keeps what is
 #   predictable and drops the teacher's noise.
 # * Training a link map on radar copies the radar's errors. On a network whose radar is weak, the
 #   target matters more than the architecture.

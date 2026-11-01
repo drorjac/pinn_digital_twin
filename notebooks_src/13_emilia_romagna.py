@@ -322,7 +322,7 @@ for ax, (F, ttl) in zip(axes.ravel(), fields):
                edgecolors=viz.BLUE, linewidths=1)
     ax.set(title=ttl, xticks=[], yticks=[])
 plt.colorbar(im, ax=axes, shrink=0.8, label="mm/h (triangles: held-out gauges, their own reading)")
-fig.suptitle(f"{s.times[k]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"{s.times[k]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "13_maps.png")
 plt.show()
 

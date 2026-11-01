@@ -323,7 +323,7 @@ for ax, (name, F), col in zip(axes, fc.items(), [viz.MUTED, viz.BLUE, viz.ORANGE
     ax.text(0.03, 0.93, f"max P(exceed) = {p_exc.max():.0%}", transform=ax.transAxes, fontsize=9, color=viz.INK2)
 axes[0].set_ylabel("c at intake")
 axes[0].legend(loc="center left", fontsize=8)
-fig.suptitle("Phase 4: probabilistic what-if forecasts (red = safety limit)", x=0.02, ha="left", fontweight="semibold")
+fig.suptitle("Phase 4: probabilistic what-if forecasts (red = safety limit)", x=0.02, ha="left", fontweight="bold")
 viz.save(fig, "10_scenarios.png")
 plt.show()
 

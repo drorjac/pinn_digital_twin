@@ -235,7 +235,7 @@ for ax, (F, ttl, cm) in zip(axes, fields):
     ax.plot(c.gauges["x"], c.gauges["y"], "^", color=viz.BLUE, ms=6, mec="white")
     ax.set(title=ttl, xticks=[], yticks=[])
 plt.colorbar(im, ax=axes, shrink=0.8, label="mm/h")
-fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "12_maps.png")
 plt.show()
 
@@ -338,10 +338,9 @@ viz.save(fig, "12_students.png")
 plt.show()
 
 # %% [markdown]
-# Chapter 11's result does not transfer. In Gothenburg the twin was the best teacher (1.03); here
+# Chapter 11's result does not transfer. In Gothenburg the twin was the best teacher (1.02); here
 # its students are the weakest after the radar's (about 0.83, and 25 % low at every gauge), well
-# behind their own teacher (0.58). The RCP students are the best students (0.51 and 0.60), though
-# the two seeds differ more than in Gothenburg.
+# behind their own teacher (0.58). The RCP students are the best students (0.56 and 0.57).
 #
 # The reason is what the teacher knows that the student cannot see. In Gothenburg the radar was
 # weak and the twin's map came mostly from the links, which the student also sees. In New York
@@ -366,7 +365,7 @@ plt.show()
 #   longer localisation, larger noise or longer memory does not fix it.
 # * Distillation depends on what the teacher used that the student cannot see. A twin that leans
 #   on a good radar is a poor teacher for a radar-free student (0.83, 25 % low); on New York data,
-#   the merged product RCP is the better teacher (0.51 to 0.60).
+#   the merged product RCP is the better teacher (0.56 to 0.57).
 # * Four gauges, two of them far from everything, are a thin exam. Differences under about 0.05
 #   should not be read as real.
 #

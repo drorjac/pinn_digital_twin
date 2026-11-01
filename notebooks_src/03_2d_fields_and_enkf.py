@@ -446,7 +446,7 @@ for j, i in enumerate(show):          # each column has its own scale: errors sh
     for r in range(4):
         viz.sensors_2d(axes[r, j], sx, sy, s=8, linewidth=0.8)
 for r, name in enumerate(["Reality", "Twin (ensemble mean)", "Twin − reality", "Twin uncertainty"]):
-    axes[r, 0].set_ylabel(name, fontsize=11, color=viz.INK, fontweight="semibold")
+    axes[r, 0].set_ylabel(name, fontsize=11, color=viz.INK, fontweight="bold")
 viz.save(fig, "06_enkf_maps.png")
 plt.show()
 

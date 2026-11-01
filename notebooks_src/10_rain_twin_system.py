@@ -267,7 +267,7 @@ for ax, (F, ttl, cm) in zip(axes, fields):
     ax.plot(c.gauges["x"], c.gauges["y"], "^", color=viz.BLUE, ms=5, mec="white")
     ax.set(title=ttl, xticks=[], yticks=[])
     plt.colorbar(im, ax=ax, shrink=0.75, label="mm/h")
-fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "10_maps.png")
 plt.show()
 print(f"peak rain: radar {np.nanmax(fields[0][0]):.1f}, RCP {np.nanmax(fields[1][0]):.1f}, "
