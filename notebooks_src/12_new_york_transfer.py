@@ -354,6 +354,74 @@ plt.show()
 # teacher's. It helps the twin students (0.66 and 0.69) and ruins the RCP students (1.33): the
 # level a student misses in the validation weeks is not the level it misses in the test storms.
 #
+# %% [markdown]
+# ## 6. The radar's bias, unfrozen
+# Chapter 13 found a bug in this twin. The radar's log-bias b is part of the state, but nothing
+# makes it move between updates: it has no process noise. At the first update hundreds of radar
+# cells collapse its ensemble spread, and from then on it stays where it landed.
+# `tools/bias_fix_runs.py` reruns the ten storms with the two fixes of Chapter 13: a random walk
+# on the bias (`q_bias=0.02` per 5 min, like the one on the velocity), and the stations observed
+# in log space (`point_log`). A `+b` mix has only the first fix, a `+` mix has both (P has no
+# radar, so P+ has only the second). The cell checks first that the rerun of the plain LPR twin is
+# identical to the run in section 3.
+
+# %%
+NET, FIG_PREFIX = "openmesh", "12"
+
+# %%
+FIX = CACHE / "fix"
+FIX_MIXES = ["LPR", "LPR+b", "LPR+", "LR+", "P+"]
+assert all((FIX / f"{NET}_{m}_{n}.npz").exists() for m in FIX_MIXES for n, _, _ in EVENTS), \
+    "run python tools/bias_fix_runs.py first"
+fix = {m: [np.load(FIX / f"{NET}_{m}_{n}.npz") for n, _, _ in EVENTS] for m in FIX_MIXES}
+assert np.allclose(np.concatenate([d["now"] for d in fix["LPR"]]), runs["LPR"]["now"], equal_nan=True)
+fix_table = {}
+for base, fixed in [("LPR", ["LPR+b", "LPR+"]), ("LR", ["LR+"]), ("P", ["P+"])]:
+    for m in [base] + fixed:
+        for k in ("mean", "now"):
+            g = runs[base][k] if m == base else np.concatenate([d[k] for d in fix[m]])
+            fix_table[f"twin {m} ({k} map)"] = score(g)
+print(pd.DataFrame(fix_table).T.round(3).to_string())
+ratio = [np.nansum(c.product("R", st[SPIN:])[:, GI[0], GI[1]]) / np.nansum(c.gauge_rain(st[SPIN:])) for st in steps]
+print("radar / gauges per storm:", " ".join(f"{r:.2f}" for r in ratio))
+for m in ("LPR", "LPR+b"):
+    f = [d["radar_factor"] for d in fix[m]]
+    print(f"radar factor, {m:5s}: range within storms {min(x.min() for x in f):.2f} to {max(x.max() for x in f):.2f}, "
+          f"at the end {np.median([x[-1] for x in f]):.2f} (median)")
+
+fig, ax = plt.subplots(figsize=(9, 4))
+for j, m in enumerate(("LPR", "LPR+b")):
+    for i, d in enumerate(fix[m]):
+        h = np.arange(d["radar_factor"].size) / 12 - 1
+        ax.plot(h, d["radar_factor"], color=(viz.MUTED, viz.TWIN)[j], lw=(1.6, 1.0)[j],
+                label=(None if i else ("frozen (the chapter's twin)", "random walk, q_bias = 0.02")[j]))
+ax.axhline(1, color=viz.INK, lw=0.8, ls="--")
+ax.set(xlabel="hours since the storm started", ylabel="learned radar factor exp(b)",
+       title="The radar's learned bias in each storm: frozen, and with a random walk")
+ax.legend(fontsize=8)
+viz.save(fig, f"{FIG_PREFIX}_bias.png")
+plt.show()
+
+# %% [markdown]
+# **Reading the rerun.**
+# * The bias is frozen here too: 0.82 to 0.89, set at the first update.
+# * Unfrozen, it **runs off**. In every storm the factor climbs to 1.7 to 2.6 ("the radar reads
+#   twice too high"), while the MRMS radar reads 0.72 to 1.51 times the gauges per storm and 27 %
+#   low overall. The twin divides the radar by that factor and ends 52 to 71 % low. The full twin's now map falls from 0.58 to 0.84
+#   (0.79 with the stations in log space), and links + radar from 0.83 to 1.25.
+# * Stations in log space alone change little (P now map 0.95 to 0.94).
+#
+# Why the difference from Gothenburg? A bias that may move can only be learned if something else
+# fixes the rain level. In Gothenburg 358 links in the scored area do that. Here the radar supplies
+# almost all the observations, and a few dozen links and stations spread over a 240 km box cannot
+# hold the level. The random walk adds a little uncertainty every 5 minutes; the radar alone
+# cannot tell a wetter field from a radar that reads high, so the bias drifts and nothing brings
+# it back.
+#
+# So the numbers of this chapter stand, and Chapter 13's fix does not carry over. Here the frozen
+# bias, a fixed calibration of about 0.85, was the safer choice. A bias that is allowed to move
+# needs ground sensors that pin the level, or a pull back towards 1 (not tried here).
+#
 # ## Conclusions
 # * The ranking of maps flips with the city. In Gothenburg links were the best sensor and the
 #   radar the worst; in New York the stations are the best sensor and the radar alone beats the
@@ -366,6 +434,9 @@ plt.show()
 # * Distillation depends on what the teacher used that the student cannot see. A twin that leans
 #   on a good radar is a poor teacher for a radar-free student (0.83, 25 % low); on New York data,
 #   the merged product RCP is the better teacher (0.56 to 0.57).
+# * The radar's bias was frozen at its first estimate here too. Unfrozen (Chapter 13's fix), it
+#   runs off to twice its value and the full twin falls from 0.58 to 0.84: with few ground
+#   sensors the radar's bias cannot be told apart from the rain level.
 # * Four gauges, two of them far from everything, are a thin exam. Differences under about 0.05
 #   should not be read as real.
 #
