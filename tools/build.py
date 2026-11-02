@@ -47,7 +47,7 @@ def build(path, execute=True):
     out = OUT / (path.stem + ".ipynb")
     if execute:
         t0 = time.time()
-        ExecutePreprocessor(timeout=1800, kernel_name="python3").preprocess(nb, {"metadata": {"path": str(OUT)}})
+        ExecutePreprocessor(timeout=7200, kernel_name="python3").preprocess(nb, {"metadata": {"path": str(OUT)}})
         print(f"  executed in {time.time() - t0:.0f}s")
     nbformat.write(nb, out)
     print(f"  -> {out.relative_to(ROOT)}  ({out.stat().st_size / 1e6:.1f} MB)")

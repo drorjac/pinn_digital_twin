@@ -151,7 +151,7 @@ for i, ax in enumerate(axes.flat):
     lim = np.abs(m).max()
     viz.field(ax, m, cmap=viz.DIVERGING, vmin=-lim, vmax=lim, cbar=False, title=f"mode {i+1}")
     ax.set_xticks([]); ax.set_yticks([])
-fig.suptitle("POD modes: from large-scale patterns to finer swirls", x=0.02, ha="left", fontweight="semibold")
+fig.suptitle("POD modes: from large-scale patterns to finer swirls", x=0.02, ha="left", fontweight="bold")
 viz.save(fig, "07_pod_modes.png")
 plt.show()
 

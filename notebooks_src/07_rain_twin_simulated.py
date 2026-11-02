@@ -176,7 +176,7 @@ for ax, (F, ttl, cm, (lo, hi)) in zip(axes, panels):
         ax.plot([net.xa[i], net.xb[i]], [net.ya[i], net.yb[i]], color=viz.INK, lw=0.5, alpha=0.4)
     plt.colorbar(im, ax=ax, label="mm/h", shrink=0.85)
     ax.set(title=ttl, xticks=[], yticks=[])
-fig.suptitle(f"Stratiform rain at t = {k*5/60:.0f} h", x=0.02, ha="left", fontweight="semibold")
+fig.suptitle(f"Stratiform rain at t = {k*5/60:.0f} h", x=0.02, ha="left", fontweight="bold")
 viz.save(fig, "07_rain_twin_maps.png")
 plt.show()
 

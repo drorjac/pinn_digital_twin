@@ -267,7 +267,7 @@ for ax, (F, ttl, cm) in zip(axes, fields):
     ax.plot(c.gauges["x"], c.gauges["y"], "^", color=viz.BLUE, ms=5, mec="white")
     ax.set(title=ttl, xticks=[], yticks=[])
     plt.colorbar(im, ax=ax, shrink=0.75, label="mm/h")
-fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"{c.times[st[k]]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "10_maps.png")
 plt.show()
 print(f"peak rain: radar {np.nanmax(fields[0][0]):.1f}, RCP {np.nanmax(fields[1][0]):.1f}, "
@@ -371,6 +371,70 @@ print(f"28 July, wet 5-min steps: {np.mean(np.abs(g[ok] - mn[ok]) <= 2 * sp[ok])
 # where sub-cell rain variability dominates. It is still useful as a *relative* map (it is large where no sensor
 # looks and during heavy rain), and Chapter 11 shows it can be learned too.
 #
+# %% [markdown]
+# ## 6. The radar's bias, unfrozen
+# Chapter 13 found a bug in this twin. The radar's log-bias b is part of the state, but nothing
+# makes it move between updates: it has no process noise. At the first update hundreds of radar
+# cells collapse its ensemble spread, and from then on it stays where it landed.
+# `tools/bias_fix_runs.py` reruns the ten storms with the two fixes of Chapter 13: a random walk
+# on the bias (`q_bias=0.02` per 5 min, like the one on the velocity), and the stations observed
+# in log space (`point_log`). A `+b` mix has only the first fix, a `+` mix has both (P has no
+# radar, so P+ has only the second). The cell checks first that the rerun of the plain LPR twin is
+# identical to the run in section 3.
+
+# %%
+NET, FIG_PREFIX = "openmrg", "10"
+
+# %%
+FIX = CACHE / "fix"
+FIX_MIXES = ["LPR", "LPR+b", "LPR+", "LR+", "P+"]
+assert all((FIX / f"{NET}_{m}_{n}.npz").exists() for m in FIX_MIXES for n, _, _ in EVENTS), \
+    "run python tools/bias_fix_runs.py first"
+fix = {m: [np.load(FIX / f"{NET}_{m}_{n}.npz") for n, _, _ in EVENTS] for m in FIX_MIXES}
+assert np.allclose(np.concatenate([d["now"] for d in fix["LPR"]]), runs["LPR"]["now"], equal_nan=True)
+fix_table = {}
+for base, fixed in [("LPR", ["LPR+b", "LPR+"]), ("LR", ["LR+"]), ("P", ["P+"])]:
+    for m in [base] + fixed:
+        for k in ("mean", "now"):
+            g = runs[base][k] if m == base else np.concatenate([d[k] for d in fix[m]])
+            fix_table[f"twin {m} ({k} map)"] = score(g)
+print(pd.DataFrame(fix_table).T.round(3).to_string())
+ratio = [np.nansum(c.product("R", st[SPIN:])[:, GI[0], GI[1]]) / np.nansum(c.gauge_rain(st[SPIN:])) for st in steps]
+print("radar / gauges per storm:", " ".join(f"{r:.2f}" for r in ratio))
+for m in ("LPR", "LPR+b"):
+    f = [d["radar_factor"] for d in fix[m]]
+    print(f"radar factor, {m:5s}: range within storms {min(x.min() for x in f):.2f} to {max(x.max() for x in f):.2f}, "
+          f"at the end {np.median([x[-1] for x in f]):.2f} (median)")
+
+fig, ax = plt.subplots(figsize=(9, 4))
+for j, m in enumerate(("LPR", "LPR+b")):
+    for i, d in enumerate(fix[m]):
+        h = np.arange(d["radar_factor"].size) / 12 - 1
+        ax.plot(h, d["radar_factor"], color=(viz.MUTED, viz.TWIN)[j], lw=(1.6, 1.0)[j],
+                label=(None if i else ("frozen (the chapter's twin)", "random walk, q_bias = 0.02")[j]))
+ax.axhline(1, color=viz.INK, lw=0.8, ls="--")
+ax.set(xlabel="hours since the storm started", ylabel="learned radar factor exp(b)",
+       title="The radar's learned bias in each storm: frozen, and with a random walk")
+ax.legend(fontsize=8)
+viz.save(fig, f"{FIG_PREFIX}_bias.png")
+plt.show()
+
+# %% [markdown]
+# **Reading the rerun.**
+# * The bug is real. Frozen, the radar factor is 0.87 to 0.93 in every storm, set by the first
+#   update. With the random walk it moves, between 0.5 and 1.8 within a storm. It does not follow
+#   the radar's actual error per storm, though (radar / gauges 0.59 to 1.70): the links set the
+#   level, and the bias only takes up what is left over.
+# * The twin **mean** gets better (1.26 with the frozen bias, 1.17 with the random walk, 1.14 with
+#   the stations in log space as well). The **now map** does not change (1.06 in all three), and
+#   neither does LR (1.05). The now map's local correction at the links already absorbs a wrong
+#   level, so the bias barely reaches the gauges.
+# * Stations in log space alone help a little (P now map 1.32 to 1.31).
+#
+# So the numbers of this chapter stand. The frozen bias acted as a fixed radar calibration of
+# about 0.9, and that was harmless here, because 358 links pin the rain level. Chapter 12 shows
+# that this does not hold everywhere.
+#
 # ## Conclusions
 # | | result on the 10 storms |
 # |---|---|
@@ -380,6 +444,7 @@ print(f"28 July, wet 5-min steps: {np.mean(np.abs(g[ok] - mn[ok]) <= 2 * sp[ok])
 # | radar in the twin | in log space, or as the base of a radar-error twin; neither beats RCP at the gauges |
 # | motion | learned; closer to the radar's when the radar is in the state |
 # | spread | far too narrow in absolute terms (15 % coverage where 95 % is expected, 28 July) |
+# | radar bias | frozen at its first estimate (about 0.9); unfreezing it improves the mean (1.26 to 1.14), not the now map (1.06) |
 #
 # So the twin is not the best *map maker* when a good radar merge is available. It is a
 # **system**: one state that takes any sensor, holds motion and uncertainty, and runs through

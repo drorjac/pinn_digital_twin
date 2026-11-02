@@ -172,7 +172,7 @@ for ax, (F, ttl, cm, hi) in zip(axes, [(r["rad"][k], "Radar", viz.FIELD, vm),
     plt.colorbar(im, ax=ax, shrink=0.8, label="mm/h")
     ax.set(title=ttl, xticks=[], yticks=[])
 fig.suptitle(f"{str(r['times'][k])[:16]}: the heaviest 5 minutes of the {ev} storm", x=0.02, ha="left",
-             fontweight="semibold")
+             fontweight="bold")
 viz.save(fig, "08_openmrg_maps.png")
 plt.show()
 

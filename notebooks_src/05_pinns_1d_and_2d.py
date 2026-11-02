@@ -241,7 +241,7 @@ for ax, (k, U) in zip(axes, snapshots.items()):
     ax.set(title=f"iteration {k}", xlabel="x")
 axes[0].set_ylabel("u")
 axes[0].legend()
-fig.suptitle("Spectral bias: smooth parts first, the front last", x=0.02, ha="left", fontweight="semibold")
+fig.suptitle("Spectral bias: smooth parts first, the front last", x=0.02, ha="left", fontweight="bold")
 plt.show()
 
 # %% [markdown]
@@ -529,7 +529,7 @@ for j, tt in enumerate(show_t):
     for r in range(4):
         viz.sensors_2d(axes[r, j], sx, sy, s=8, linewidth=0.8)
 for r, name in enumerate(["Reality", "PINN twin", "PINN − reality", "Interpolation − reality"]):
-    axes[r, 0].set_ylabel(name, fontsize=11, color=viz.INK, fontweight="semibold")
+    axes[r, 0].set_ylabel(name, fontsize=11, color=viz.INK, fontweight="bold")
 viz.save(fig, "09_pinn_2d.png")
 plt.show()
 

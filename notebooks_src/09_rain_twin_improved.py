@@ -259,7 +259,7 @@ for ax, (F, ttl) in zip(axes, [(r["radar"][k], "Radar"), (idw_map, "Line IDW of 
     ax.set(title=ttl, xticks=[], yticks=[])
 plt.colorbar(im, ax=axes, shrink=0.8, label="mm/h")
 fig.suptitle(f"{str(r['times'][k])[:16]}: the heaviest 5 minutes of the {ev} storm", x=0.02, ha="left",
-             fontweight="semibold")
+             fontweight="bold")
 viz.save(fig, "09_hybrid_maps.png")
 plt.show()
 

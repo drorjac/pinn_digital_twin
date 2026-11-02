@@ -322,7 +322,7 @@ for ax, (F, ttl) in zip(axes.ravel(), fields):
                edgecolors=viz.BLUE, linewidths=1)
     ax.set(title=ttl, xticks=[], yticks=[])
 plt.colorbar(im, ax=axes, shrink=0.8, label="mm/h (triangles: held-out gauges, their own reading)")
-fig.suptitle(f"{s.times[k]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="semibold")
+fig.suptitle(f"{s.times[k]:%d %b %Y %H:%M}", x=0.01, ha="left", fontweight="bold")
 viz.save(fig, "13_maps.png")
 plt.show()
 
@@ -348,5 +348,7 @@ plt.show()
 # * The links add nothing in Emilia-Romagna, to the twin or to FieldSense's merges, with 300 gauges
 #   5 km apart. This matches FieldSense's finding for this network.
 # * The frozen radar bias is in Chapters 10 and 12 as well, so their "learned radar bias" was the
-#   first update's estimate. Rerunning them with `q_bias` is the first next step; the log-space
-#   stations (`point_log`) are worth trying there too.
+#   first update's estimate. Their section 6 reruns them with both fixes: in Gothenburg the now
+#   map does not change (1.06), and in New York the unfrozen bias runs off and the twin gets
+#   worse (0.58 to 0.84). The random walk helps only where other sensors pin the rain level, as
+#   300 gauges do here.
