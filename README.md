@@ -1,29 +1,29 @@
-# Digital Twins of Spatio-Temporal Fields: 1D → 2D, Beginner → Expert
+# Digital Twins of Spatio-Temporal Fields: 1D → 2D
 
-A hands-on course in 13 executed Jupyter notebooks: six chapters of course, then a seven-chapter
-project on real data. In the course you build digital twins of physical fields:
-a heated rod (1D) and a stirred contaminated tank (2D). You start from a 10-line finite-difference
-solver and finish with a twin that detects a hidden leak, locates it, forecasts what-if scenarios
-and recommends an action.
+Digital twins of physical fields in 13 executed Jupyter notebooks. Part I builds the methods on
+two simulated systems, a heated rod (1D) and a stirred contaminated tank (2D): from a 10-line
+finite-difference solver to a twin that detects a hidden leak, locates it, forecasts what-if
+scenarios and recommends an action. Parts II and III apply them to rain: a twin that maps and
+forecasts rainfall from phone-network microwave links, tested on simulated truth and on real data
+from Gothenburg, New York and Emilia-Romagna.
 
 ![dashboard](figures/10_dashboard.png)
 
-## Learning path
-### Part I · The course
-Six chapters. Each one teaches step by step: the intuition, the math, a small piece of code, and a
-check of what you should see. Along the way there are "predict" questions with hidden answers, a
-glossary, a quiz and exercises.
+## Contents
+### Part I · Methods on simulated fields
+Six chapters, each going from the intuition and the math to code; results are checked against an
+exact solution or the simulated truth wherever there is one.
 
-| # | Chapter | Level | Dim | You learn |
-|---|---|---|---|---|
-| 1 | `01_foundations_physics_and_sensors` | Beginner | 1D | what a twin is, the heat equation derived from energy bookkeeping, finite differences with a convergence study, stability (amplification factor), Crank-Nicolson, the observation operator H, noise, interpolation limits, open-loop drift, and how wrong parameters and wrong inputs can cancel |
-| 2 | `02_calibration_and_kalman_1d` | Intermediate | 1D | least squares as maximum likelihood, Gauss-Newton by hand, loss landscapes, identifiability, error bars, sensor placement; the Kalman filter from a single number up to a whole field, state augmentation, NIS, tuning |
-| 3 | `03_2d_fields_and_enkf` | Advanced | 2D | flattening and the 5-point Laplacian, upwind advection, Péclet number, mass balance; an EnKF toy example, then joint state-parameter estimation, inflation, localization |
-| 4 | `04_reduced_order_models` | Advanced | 2D | the SVD on the rod, POD, DMD, operator inference, QR sensor placement, a reduced Kalman filter |
-| 5 | `05_pinns_1d_and_2d` | Expert | 1D/2D | autograd, a one-minute inverse PINN, Burgers forward and inverse, spectral bias, the 2D PINN twin (κ, velocity, back-tracking the release) |
-| 6 | `06_capstone_end_to_end_twin` | Expert | 2D | monitor → detect (NIS) → diagnose (Green's functions + Bayes) → what-if → decide → verify |
+| # | Chapter | Dim | Content |
+|---|---|---|---|
+| 1 | `01_foundations_physics_and_sensors` | 1D | what a twin is, the heat equation derived from energy bookkeeping, finite differences with a convergence study, stability (amplification factor), Crank-Nicolson, the observation operator H, noise, interpolation limits, open-loop drift, and how wrong parameters and wrong inputs can cancel |
+| 2 | `02_calibration_and_kalman_1d` | 1D | least squares as maximum likelihood, Gauss-Newton by hand, loss landscapes, identifiability, error bars, sensor placement; the Kalman filter from a single number up to a whole field, state augmentation, NIS, tuning |
+| 3 | `03_2d_fields_and_enkf` | 2D | flattening and the 5-point Laplacian, upwind advection, Péclet number, mass balance; an EnKF toy example, then joint state-parameter estimation, inflation, localization |
+| 4 | `04_reduced_order_models` | 2D | the SVD on the rod, POD, DMD, operator inference, QR sensor placement, a reduced Kalman filter |
+| 5 | `05_pinns_1d_and_2d` | 1D/2D | autograd, a one-minute inverse PINN, Burgers forward and inverse, spectral bias, the 2D PINN twin (κ, velocity, back-tracking the release) |
+| 6 | `06_capstone_end_to_end_twin` | 2D | monitor → detect (NIS) → diagnose (Green's functions + Bayes) → what-if → decide → verify |
 
-### Part II · Applied project: a rain twin from microwave links
+### Part II · A rain twin from microwave links
 Builds on the FieldSense / OpenMesh / pcpn_maps work: phone-network microwave links act as
 path-averaging rain sensors, and a digital twin maps the rain and forecasts it.
 

@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 13 · Project: the same twin in Emilia-Romagna (2021–22)
-# **Level: Expert** · ~25 min to read · first run ~50 min (`python tools/italy_runs.py`), then cached · 2D · *Applied project, part 7*
+# 2D · first run about 50 min (`python tools/italy_runs.py`), then cached · *Rain twin, part 7*
 #
 # A third network, and a third kind of sensor mix. Gothenburg had many links and a weak radar;
 # New York had few links and good stations. Emilia-Romagna, in northern Italy, has a region-wide

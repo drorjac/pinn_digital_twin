@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 1 · Foundations: the physics model, the sensors, and the twin gap
-# **Level: Beginner** · ~45 min · 1D
+# 1D
 #
 # ## What is a digital twin?
 # A **digital twin** is a computer model of one specific physical object. The model is **kept in
@@ -9,9 +9,9 @@
 # * **see between the sensors**: estimate the field everywhere, not just at a few points
 # * **see ahead**: forecast what will happen next, and what *would* happen if you acted
 #
-# Every twin in this course is built from the same five parts:
+# Every twin here is built from the same five parts:
 #
-# | Part | Question it answers | Where you learn it |
+# | Part | Question it answers | Where it is built |
 # |---|---|---|
 # | 1. **Physical asset** | what are we twinning? | this chapter (a heated rod) |
 # | 2. **Physics model** | how does the asset behave? | this chapter, Part A |
@@ -21,26 +21,6 @@
 #
 # This chapter builds parts 1–3. At the end you'll see why they are **not yet a twin**.
 #
-# ## How to use this chapter
-# * Run the cells top to bottom (Shift+Enter).
-# * 🔮 **Predict** boxes ask you to guess the result *before* running the next cell. Guessing first
-#   is the fastest way to learn.
-# * ✅ **Check** boxes tell you what you should see. If you see something else, something is wrong.
-# * Click **"Answer"** to expand hidden answers.
-#
-# ## Glossary (come back here when a word is unclear)
-# | Term | Meaning |
-# |---|---|
-# | **field** | a quantity defined at every point in space, e.g. temperature $u(x)$ |
-# | **spatio-temporal** | changes in both space and time: $u(x, t)$ |
-# | **PDE** | partial differential equation: a rule that links rates of change in space and in time |
-# | **grid / mesh** | the finite set of points $x_0, x_1, \dots$ where the computer stores the field |
-# | **state vector** | all the grid values at one instant, stacked into one array $\mathbf u_k$ |
-# | **time step** $\Delta t$ | how far in time one update of the simulator jumps |
-# | **boundary condition** | what happens at the ends of the domain |
-# | **observation operator** $H$ | the matrix that turns a state into what the sensors read |
-# | **open loop** | running the model without ever looking at data |
-
 # %%
 import sys; sys.path.insert(0, "..")
 import numpy as np
@@ -85,7 +65,7 @@ rng = np.random.default_rng(42)
 # boundary and initial conditions the PDE has infinitely many solutions.
 #
 # **Units, so you don't get scared:** we work in *dimensionless* units with $L = 1$ and
-# $\alpha \approx 0.01$. Every number in this course is of order one. That keeps the code readable.
+# $\alpha \approx 0.01$. Every number in these notebooks is of order one. That keeps the code readable.
 
 # %% [markdown]
 # ## A2. The intuition: curvature drives change
@@ -114,7 +94,7 @@ axes[1].legend(loc="lower right")
 plt.show()
 
 # %% [markdown]
-# ✅ **Check:** the blue regions sit under the peaks and the orange ones on their flanks. The
+# The blue regions sit under the peaks and the orange ones on their flanks. The
 # sharp peak at 0.3 has much stronger curvature than the broad one at 0.7, so it will flatten
 # faster. Narrow features die fast, broad features live long. Remember this; it explains the
 # stability limit in A7 and much of Chapter 5.
@@ -150,7 +130,7 @@ slope = np.polyfit(np.log(hs), np.log(err_fd), 1)[0]
 print(f"measured slope = {slope:.2f}  (theory: 2)")
 
 # %% [markdown]
-# ✅ **Check:** the slope is 2. This little test is called a **convergence study**. It is the
+# The slope is 2. This little test is called a **convergence study**. It is the
 # most important habit in scientific computing: *check that your error shrinks at the rate theory
 # promises.*
 
@@ -182,12 +162,9 @@ print("after: ", new, "  sum =", new.sum())
 # Read the output: the hot spot gives $2r = 50\%$ of its heat away, a quarter to each
 # neighbour. Total heat is conserved because nothing has reached the ice-bath ends yet.
 #
-# 🔮 **Predict:** what happens if $r = 0.75$? Work out the new middle value before opening.
-# <details><summary>Answer</summary>
-#
-# $1 + 0.75\,(0 - 2 + 0) = -0.5$. The hot spot becomes **colder than its cold neighbours**. Physics
-# never does that: heat can't overshoot. This is the seed of the instability in A7.
-# </details>
+# With $r = 0.75$ the middle value becomes $1 + 0.75\,(0 - 2 + 0) = -0.5$. The hot spot becomes
+# **colder than its cold neighbours**. Physics never does that: heat can't overshoot. This is the
+# seed of the instability in A7.
 
 # %% [markdown]
 # ## A5. The FTCS solver
@@ -261,7 +238,7 @@ for h, e in zip(dxs, errs):
 print(f"observed order of accuracy: {p:.2f}")
 
 # %% [markdown]
-# ✅ **Check:** each halving of $\Delta x$ cuts the error by about 4 (order ≈ 2). The solver is
+# Each halving of $\Delta x$ cuts the error by about 4 (order ≈ 2). The solver is
 # **verified**: it solves the equation we wrote down, to the accuracy we expect.
 
 # %% [markdown]
@@ -342,7 +319,7 @@ print(f"steps for 10 time units: FTCS {int(10/(0.5*dx**2/alpha))}, CN {len(t_cn)
 print(f"CN max error at t=10: {np.abs(U_cn[-1] - np.exp(-alpha*np.pi**2*10)*u0).max():.1e}")
 
 # %% [markdown]
-# ✅ **Check:** about 40 steps instead of 2000, and still accurate to about $10^{-5}$. The
+# About 40 steps instead of 2000, and still accurate to about $10^{-5}$. The
 # matrices also give us something we'll need in Chapter 2: the model in the linear form
 # $\mathbf u_{k+1} = M\,\mathbf u_k + G\,\mathbf f_k$ (from `Heat1D.transition_matrices()`).
 # **That linear form is exactly what a Kalman filter needs.**
@@ -352,7 +329,6 @@ print(f"CN max error at t=10: {np.abs(U_cn[-1] - np.exp(-alpha*np.pi**2*10)*u0).
 # Now the actual asset. Heater A sits at $x=0.3$ and switches on at $t=1$. Heater B sits at
 # $x=0.75$, is weaker, and runs from $t=4$ to $t=7$. The rod starts cold.
 #
-# 🔮 **Predict:** sketch the temperature at $t=6$ before running the cell.
 
 # %%
 def heaters(x, t):
@@ -381,7 +357,7 @@ viz.save(fig, "01_heated_rod.png")
 plt.show()
 
 # %% [markdown]
-# **How to read a space-time diagram.** It is the main picture of this course, so take a minute:
+# **How to read a space-time diagram.** It is the main picture of these notebooks:
 # * the **horizontal axis** is position along the rod, the **vertical axis** is time, going up
 # * a **horizontal slice** is a snapshot of the whole rod at one instant (the right panel)
 # * a **vertical slice** is the history of one point, which is what a thermometer there would record
@@ -422,7 +398,7 @@ ax.legend(ncol=2)
 plt.show()
 
 # %% [markdown]
-# ✅ **Check:** the dashed black line (what actually happened) sits on the aqua line (what the
+# The dashed black line (what actually happened) sits on the aqua line (what the
 # budget says). The small mismatch at the switch-on instants comes from the finite time step.
 #
 # **Part A summary.** PDE + grid + time stepper = **simulator**. We verified it three ways: against
@@ -556,8 +532,8 @@ plt.show()
 # Interpolation misses the peak: no sensor sits on it, and interpolation doesn't know a heater
 # exists.
 #
-# 🔮 **Predict:** more sensors make it better, but does the error keep falling forever? And what
-# does noise do?
+# More sensors make interpolation better. Does the error keep falling forever, and what does
+# noise do?
 
 # %%
 ms = np.arange(2, 31)
@@ -576,12 +552,9 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# <details><summary>Answer</summary>
-#
 # With perfect sensors the error keeps falling. With noise it flattens at roughly $\sigma$:
 # interpolation passes *through* every noisy reading, so it can never be better than the sensors.
 # And interpolation can't **forecast**; it says nothing about $t + 1$. Both limits need physics.
-# </details>
 
 # %% [markdown]
 # ---
@@ -664,41 +637,19 @@ plt.show()
 
 # %% [markdown]
 # ---
-# # Recap: the twin gap
+# # Summary: the twin gap
 # | Approach | Strength | Weakness |
 # |---|---|---|
 # | **Data only** (interpolation) | agrees with the sensors | blind between sensors, can't beat the noise, can't forecast |
 # | **Physics only** (open loop) | full field and a forecast | drifts if parameters, inputs or initial state are wrong |
-# | **Digital twin** = physics **+** data | the best of both | *the rest of this course* |
+# | **Digital twin** = physics **+** data | the best of both | *Chapters 2 to 13* |
 #
-# **Key ideas to remember**
+# **Key ideas**
 # 1. The heat equation is energy bookkeeping, and curvature drives change.
 # 2. Finite differences turn derivatives into neighbour arithmetic; verify the error rate.
 # 3. Explicit schemes have a speed limit ($r \le 1/2$); implicit schemes trade it for a linear solve.
 # 4. Sensors are a matrix $H$ plus noise $R$. That language is used everywhere from here on.
 # 5. Neither data alone nor physics alone is enough.
-#
-# ## Quick quiz
-# 1. Doubling $\alpha$ makes heat spread faster or slower? What does it do to the FTCS step limit?
-# 2. A sensor reads 0.53 with $\sigma = 0.01$. Is a true value of 0.50 plausible?
-# 3. Why can't interpolation forecast?
-#
-# <details><summary>Answers</summary>
-#
-# 1. Faster. The limit $\Delta t \le \Delta x^2/(2\alpha)$ halves.
-# 2. Barely. 0.03 is $3\sigma$ away, which happens for only about 0.3% of readings.
-# 3. It contains no rule for how the field changes in time. Only the physics model has one.
-# </details>
-#
-# ## Exercises
-# 1. **Insulated ends.** Replace the ice baths with insulation (`Heat1D(..., bc="neumann")`). Where
-#    does the heat go now? Redo the energy budget.
-# 2. **Better sensor placement.** Put one sensor exactly at the heater ($x = 0.35$). How much does
-#    the interpolation error drop?
-# 3. **Quality vs quantity.** With noise $\sigma = 0.05$, are 6 good sensors ($\sigma = 0.01$) better
-#    than 20 noisy ones? Use the sensor-count loop.
-# 4. **Stability, hands on.** Find the largest $r$ for which FTCS survives 1000 steps from
-#    `u0_noisy`. Does it match theory?
 #
 # **Next: Chapter 2** closes the gap in 1D: first **calibration** (find $\alpha$ from data), then
 # the **Kalman filter** (correct the state and track the heater power live).

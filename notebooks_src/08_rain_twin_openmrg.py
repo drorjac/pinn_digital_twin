@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 8 · Project: the rain twin on real links (OpenMRG, Gothenburg)
-# **Level: Expert** · ~30 min · 2D · *Applied project, part 2 of 2*
+# 2D · *Rain twin, part 2*
 #
 # Chapter 7 showed on simulated rain that a link-driven twin maps about as well as IDW and
 # **forecasts much better**, because its state carries the storm's motion. Now the real thing:

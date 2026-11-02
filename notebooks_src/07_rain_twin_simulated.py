@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 7 · Project: a digital twin of rainfall seen by microwave links (simulated truth)
-# **Level: Expert** · ~30 min · 2D · *Applied project, part 1 of 2*
+# 2D · *Rain twin, part 1*
 #
 # Phone networks carry data between towers on **commercial microwave links (CMLs)**. Rain
 # weakens their signal, so every link is an accidental rain gauge. It doesn't measure rain at a
@@ -14,9 +14,9 @@
 #
 # A digital twin attacks exactly that second point. It keeps a **physical state**, the rain field
 # *and its motion*, that lives between the links and moves with the storm. The links only correct
-# it. Every piece comes from this course:
+# it. Every piece comes from Chapters 1 to 6:
 #
-# | Twin part | Here | Course chapter |
+# | Twin part | Here | Chapter |
 # |---|---|---|
 # | state | log rain rate on a grid + storm velocity $(u, v)$ | Ch. 3 (state augmentation) |
 # | model | semi-Lagrangian advection, relaxation to a background, stochastic growth/decay | Ch. 3 (advection) |

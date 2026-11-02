@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 12 · Project: the same twin in New York (winter 2023–24)
-# **Level: Expert** · ~30 min to read · first run ~90 min, then cached · 2D · *Applied project, part 6*
+# 2D · first run about 90 min, then cached · *Rain twin, part 6*
 #
 # Chapters 10 and 11 were built on Gothenburg in summer: 358 links, convective storms, a weak
 # radar. Here the same code, with the same settings, goes to New York City in winter:

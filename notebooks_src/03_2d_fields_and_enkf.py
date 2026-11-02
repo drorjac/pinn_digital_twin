@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 3 · Going 2D: transport fields and the ensemble Kalman filter
-# **Level: Advanced** · ~60 min · 2D
+# 2D
 #
 # The 1D rod taught the method. Now the asset is a **stirred water tank** (or a ventilated room)
 # with a contaminant concentration $c(x, y, t)$. Two new difficulties appear:
@@ -15,21 +15,8 @@
 # | **A** | the advection-diffusion equation, solving it in 2D, the Péclet number, a leak, mass balance |
 # | **B** | the ensemble Kalman filter (EnKF): a 2D twin that tracks the field and learns its own physics |
 #
-# **Prerequisites:** Chapters 1–2 (finite differences, $H$, the Kalman update).
+# Builds on Chapters 1–2 (finite differences, $H$, the Kalman update).
 #
-# ## Glossary for this chapter
-# | Term | Meaning |
-# |---|---|
-# | **advection** | being carried along by a flow, like smoke in the wind |
-# | **diffusion** | spreading from high to low concentration, like the heat in Chapter 1 |
-# | **velocity field** $\mathbf v(x,y)$ | the flow's direction and speed at every point |
-# | **stream function** $\psi$ | a scalar whose contour lines are the flow's streamlines |
-# | **Péclet number** Pe | advection strength divided by diffusion strength |
-# | **finite volume** | a scheme that tracks how much material flows across each cell face, so mass is conserved exactly |
-# | **ensemble** | a set of $N$ model runs, each a plausible version of reality |
-# | **inflation** | artificially widening the ensemble so it doesn't become over-confident |
-# | **localization** | ignoring correlations between points far apart, which a small ensemble gets wrong |
-
 # %%
 import sys; sys.path.insert(0, "..")
 import time
@@ -81,7 +68,7 @@ for n_ in [16, 32, 64]:
           f"{np.abs(lap + 2*np.pi**2*F)[inner, inner].max():.4f}")
 
 # %% [markdown]
-# ✅ **Check:** the error drops by about 4× each time $n$ doubles. It is the same second-order
+# The error drops by about 4× each time $n$ doubles. It is the same second-order
 # behaviour as in 1D, now in two directions.
 #
 # ## A2. Advection: being carried by the flow
@@ -311,7 +298,7 @@ print(f"after   kappa = {kap_a.mean()*1e3:.2f} ± {kap_a.std()*1e3:.2f}   true {
 print(f"correlation(kappa, predicted reading) = {np.corrcoef(kap, pred)[0,1]:+.2f}")
 
 # %% [markdown]
-# ✅ **Check:** the correlation is strongly negative (more diffusion means a lower peak), so a reading
+# The correlation is strongly negative (more diffusion means a lower peak), so a reading
 # that is low pushes $\kappa$ up. The posterior is much narrower and close to the truth. The full
 # 2D twin below does exactly this, with 2,304 field values and 2 parameters at once.
 #
@@ -551,7 +538,7 @@ HTML(anim.to_jshtml())
 
 # %% [markdown]
 # ---
-# # Chapter recap
+# # Summary
 # * 2D transport = advection + diffusion + decay + sources. The **Péclet number** sets the structure.
 # * Finite volumes conserve mass exactly, but upwinding adds numerical diffusion.
 # * The **EnKF** swaps the covariance matrix for an ensemble of nonlinear model runs. It scales to
@@ -560,25 +547,6 @@ HTML(anim.to_jshtml())
 #   correlations that a small ensemble produces.
 # * Always check spread vs error: a twin whose spread is much smaller than its real error is
 #   over-confident.
-#
-# ## Quick quiz
-# 1. Pe = 500. Do you expect smooth blobs or thin filaments?
-# 2. Why does an ensemble of 8 members produce correlations between far-apart points that aren't real?
-# 3. The ensemble spread of $\kappa$ shrinks to almost zero in 10 steps but the estimate is wrong. What happened, and what fixes it?
-#
-# <details><summary>Answers</summary>
-#
-# 1. Thin filaments: advection dominates.
-# 2. Sampling noise. Any two variables have a random sample correlation of order $1/\sqrt{N}$ even
-#    when the true correlation is zero.
-# 3. Ensemble collapse: the filter became over-confident and now ignores the data. Add inflation,
-#    or parameter noise, and check the NIS.
-# </details>
-#
-# ## Exercises
-# 1. Move the inlet next to a wall. How do the probe arrival times change?
-# 2. Run the EnKF with N = 15 and no localization. What happens to the κ estimate?
-# 3. Turn inflation off (1.0). Plot the spread of κ over time.
 #
 # **Next: Chapter 4.** The EnKF needs dozens of full model runs every step. Reduced-order models
 # make the physics up to 100× faster, enough to run the twin in real time.

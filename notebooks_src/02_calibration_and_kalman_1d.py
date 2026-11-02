@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 2 · Closing the gap in 1D: calibration and the Kalman filter
-# **Level: Intermediate** · ~60 min · 1D
+# 1D
 #
 # Chapter 1 ended with an open-loop twin that drifted because it had the **wrong parameters** and
 # the **wrong input**. This chapter fixes both, in two parts:
@@ -10,23 +10,9 @@
 # | **A. Calibration** | nonlinear least squares | once, offline, on recorded data | constant parameters such as $\alpha$ |
 # | **B. Kalman filter** | sequential Bayesian update | continuously, every time data arrive | the state and inputs that change over time |
 #
-# **Prerequisites:** Chapter 1 (the heat equation, `Heat1D`, $H$ and $R$). Some linear algebra
+# Builds on Chapter 1 (the heat equation, `Heat1D`, $H$ and $R$). Some linear algebra
 # helps (matrix products, inverse), and so does knowing what a Gaussian distribution is.
 #
-# ## Glossary for this chapter
-# | Term | Meaning |
-# |---|---|
-# | **forward problem** | parameters → simulate → predicted data |
-# | **inverse problem** | data → which parameters produced them? |
-# | **residual** | data minus model prediction, one number per sensor and time |
-# | **cost / loss** $J$ | a single number measuring the total misfit; we minimise it |
-# | **Jacobian** | how much each residual changes when each parameter changes |
-# | **covariance** | the matrix of variances (on the diagonal) and co-variations (off it) of uncertain quantities |
-# | **prior / forecast** | what we believe *before* seeing new data |
-# | **posterior / analysis** | what we believe *after* combining it with the data |
-# | **innovation** | the surprise: new reading minus what the twin predicted it would be |
-# | **gain** $K$ | how much of the surprise the twin accepts |
-
 # %% [markdown]
 # ---
 # # Part A · Calibration: learning parameters from data
@@ -139,7 +125,7 @@ gn_hist = gauss_newton_alpha(0.006)
 print(f"true alpha = {ALPHA_TRUE};   number of readings / 2 = {Y[1:].size/2:.0f}")
 
 # %% [markdown]
-# ✅ **Check:** from a guess that is 50% off, Gauss-Newton is within 1% after two or three
+# From a guess that is 50% off, Gauss-Newton is within 1% after two or three
 # iterations. The final $J$ is close to (number of readings)/2: the leftover misfit is just noise,
 # so the fit has used all the information in the data and isn't **overfitting**.
 #
@@ -343,12 +329,8 @@ ax.legend()
 plt.show()
 
 # %% [markdown]
-# 🔮 **Predict:** if the sensor were as noisy as the model ($R = P$), what would $K$ and the
-# analysis be?
-# <details><summary>Answer</summary>
-#
-# $K = 0.5$: the plain average, 21.0. The uncertainty drops by a factor $\sqrt2$.
-# </details>
+# If the sensor were as noisy as the model ($R = P$), the gain would be $K = 0.5$ and the analysis
+# the plain average, 21.0; the uncertainty would drop by a factor $\sqrt2$.
 #
 # ## B2. The same idea over time: forecast, then correct
 # A twin repeats two steps forever:
@@ -388,7 +370,7 @@ plt.show()
 print(f"RMSE: raw readings {np.sqrt(np.mean((y1-truth1)**2)):.3f}, filter {np.sqrt(np.mean((est-truth1)**2)):.3f}")
 
 # %% [markdown]
-# ✅ **Check:** the filter's error is several times smaller than the raw readings', because it
+# The filter's error is several times smaller than the raw readings', because it
 # averages over time in an optimal way.
 #
 # ## B3. From one number to a whole field
@@ -612,7 +594,7 @@ HTML(fig_anim.to_jshtml())
 
 # %% [markdown]
 # ---
-# # Chapter recap
+# # Summary
 # | | Calibration (Part A) | Kalman filter (Part B) |
 # |---|---|---|
 # | runs | offline, once | online, every step |
@@ -620,7 +602,7 @@ HTML(fig_anim.to_jshtml())
 # | uncertainty | $(J^\top J)^{-1}$ | the covariance $P$, updated every step |
 # | main risk | stale when the asset changes | over-confidence if $Q$ is too small (watch NIS) |
 #
-# **Key ideas to remember**
+# **Key ideas**
 # 1. Least squares = maximum likelihood with Gaussian noise.
 # 2. Correlated parameters form valleys in the loss; sensor placement decides what is identifiable.
 # 3. The Kalman gain is a precision-weighted average: $K = P/(P+R)$ in 1D.
@@ -632,23 +614,3 @@ HTML(fig_anim.to_jshtml())
 # needs a linear model. A 2D field has thousands of cells and parameters that enter nonlinearly,
 # so Chapter 3 introduces the **ensemble Kalman filter**.
 #
-# ## Quick quiz
-# 1. A sensor is 4× noisier in variance than the model forecast. What is $K$?
-# 2. Why does the heater-power estimate lag the truth?
-# 3. Mean NIS is 25 with 5 sensors. What's wrong, and which knob do you turn?
-#
-# <details><summary>Answers</summary>
-#
-# 1. $K = P/(P + 4P) = 0.2$.
-# 2. Heat needs time to diffuse from the heater to the sensors. No filter can see a change before it
-#    reaches a sensor.
-# 3. The filter is over-confident: its forecasts are worse than it thinks. Increase $Q$ (or check
-#    the model for a bias).
-# </details>
-#
-# ## Exercises
-# 1. Add the heater *position* as a third calibration unknown. Which pairs become correlated?
-# 2. Double the noise. How do the ellipse axes scale? (Theory: linearly in σ.)
-# 3. Remove 3 sensors from the Kalman twin. Where does the uncertainty grow most?
-# 4. Make $\alpha$ 30% wrong inside the Kalman twin. What does NIS do? Can you augment $\alpha$
-#    too? (Hint: it enters $M$ nonlinearly, which is why Chapter 3 uses an ensemble.)

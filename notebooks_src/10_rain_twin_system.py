@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 10 · Project: one twin, three kinds of sensor (Gothenburg, summer 2015)
-# **Level: Expert** · ~40 min to read · first run ~40 min, then cached · 2D · *Applied project, part 4*
+# 2D · first run about 40 min, then cached · *Rain twin, part 4*
 #
 # Chapters 8 and 9 used links only, on 8 days. Here the twin gets the whole summer of 2015 and
 # every sensor Gothenburg has:
@@ -239,7 +239,7 @@ print(f"\nRCP better than the twin in {(PS['static RCP'] < PS['twin L (now map)'
 # * Nearly 80 % of RCP's lead comes from **two storms**, 2 June and 28 July (about 30 hours
 #   each). They are neither the most intense (the end of August has higher rates) nor the
 #   longest (7 July lasts 41 hours and adds almost nothing to the gap). What sets them apart is
-#   an open question (exercise: map where RCP and the twin differ most in those two storms).
+#   an open question (a map of where RCP and the twin differ most in those two storms would be the next check).
 # * So "the merge beats the twin" is mostly a statement about those two storms. With ten storms,
 #   one or two of them can decide the table; the bootstrap in `tools/extend_runs.py A` puts a
 #   95 % range of about 0.75 to 1.3 on every map's total score, while the *paired* difference

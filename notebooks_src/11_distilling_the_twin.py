@@ -1,7 +1,6 @@
 # %% [markdown]
 # # Chapter 11 · Project: distilling the twin into a fast network
-# **Level: Expert** · ~30 min to read · first run ~1 h (teacher + 7 trainings), then cached · 2D ·
-# *Applied project, part 5*
+# 2D · first run about 1 h (teacher + 7 trainings), then cached · *Rain twin, part 5*
 #
 # Chapter 10's twin is slow: every 5 minutes it advects 40 ensemble members, runs a Kalman update
 # with about 770 observations, and needs the radar. As a *teacher* it has a lot going for it. It runs

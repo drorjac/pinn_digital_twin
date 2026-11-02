@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 6 · Capstone: an end-to-end digital twin of a contaminated tank
-# **Level: Expert** · ~45 min · 2D
+# 2D
 #
 # This notebook runs a complete twin life cycle on the stirred tank of Chapter 3:
 #
@@ -455,16 +455,11 @@ HTML(anim.to_jshtml())
 # * handle sensor faults: a broken probe also raises NIS. Per-sensor innovation statistics tell the two apart;
 # * close the loop with optimal control (MPC) instead of a fixed menu of actions.
 #
-# ## Course recap in one table
-# | Chapter | You learned | It powers which step of this capstone |
+# ## How the earlier chapters feed this one
+# | Chapter | Method | Role in this twin |
 # |---|---|---|
 # | 1 | physics models, verification, sensors $H$, $R$ | the simulator and the probe array |
 # | 2 | calibration, Kalman filter, NIS | commissioning, the alarm, Bayesian diagnosis |
 # | 3 | 2D transport, EnKF, inflation, localization | monitoring the tank and the what-if ensembles |
 # | 4 | POD/DMD/ROMs, sensor placement | making it real-time (next step) |
 # | 5 | PINNs | offline re-calibration from scattered data (next step) |
-#
-# **Exercises**
-# 1. Move the leak next to a probe, then midway between four probes. How do detection delay and location uncertainty change?
-# 2. Inject a sensor fault (one probe stuck at 0.3 from t = 30). Does the NIS alarm fire? How would you distinguish it from a leak?
-# 3. Halve the number of ensemble members. Does the decision change?

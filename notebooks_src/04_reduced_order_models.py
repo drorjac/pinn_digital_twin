@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 4 · Reduced-order models: a twin that runs in real time
-# **Level: Advanced** · ~40 min · 2D
+# 2D
 #
 # Chapter 3's EnKF ran 40 full simulations every step. In real plants a twin must keep up with
 # the clock, often on modest hardware. The way out: a 64×64 field has 4,096 numbers, but the
@@ -18,19 +18,8 @@
 # | **QR sensor placement** | where should $p$ sensors go to recover the $r$ modes? |
 # | **Reduced Kalman filter** | real-time data assimilation in mode space |
 #
-# **Prerequisites:** Chapters 1–3, and the singular value decomposition (we recap it below).
+# Builds on Chapters 1–3 and on the singular value decomposition, summarised below.
 #
-# ## Glossary
-# | Term | Meaning |
-# |---|---|
-# | **snapshot** | the full field at one instant, flattened into a vector |
-# | **snapshot matrix** $X$ | snapshots stacked as rows: (number of snapshots) × (number of cells) |
-# | **SVD** | $X = U\Sigma V^\top$: any matrix as a sum of rank-one patterns, sorted by importance |
-# | **mode** $\phi_i$ | a spatial pattern (a column of $V$) |
-# | **singular value** $\sigma_i$ | how much of the data the mode explains. "Energy" is $\sigma_i^2$ |
-# | **rank** $r$ | how many modes we keep |
-# | **surrogate** | a fast model that imitates a slow one |
-
 # %%
 import sys; sys.path.insert(0, "..")
 import time
@@ -80,19 +69,15 @@ axes[2].set_title(f"Rank-{r} reconstruction error (scale ±0.01)")
 plt.show()
 
 # %% [markdown]
-# ✅ **Check:** three numbers per instant, instead of 121, already capture 98.8% of the energy
+# Three numbers per instant, instead of 121, already capture 98.8% of the energy
 # (about 11% error), and eight numbers bring the error below 1%. Mode 1 looks like "the average hump", mode 2 like "the hump shifted left or right", and
 # mode 3 like "narrower or wider". POD discovers the physically meaningful degrees of freedom by
 # itself.
 #
-# 🔮 **Predict:** a sharp front that *moves* across the domain needs many more modes than this
-# wandering blob. Why?
-# <details><summary>Answer</summary>
-#
-# A fixed set of spatial patterns has to represent a feature at every position it visits. A
+# A sharp front that *moves* across the domain needs many more modes than this wandering blob. A
+# fixed set of spatial patterns has to represent a feature at every position it visits. A
 # narrow moving feature looks different at every instant, so the singular values decay slowly.
 # This is the *Kolmogorov n-width* problem mentioned at the end of this chapter.
-# </details>
 #
 # Now the 2D tank.
 
@@ -333,7 +318,7 @@ anim = viz.animate_2d([test[sel], est[sel], sd[sel]], ts[sel], ["Reality", "Redu
 HTML(anim.to_jshtml())
 
 # %% [markdown]
-# ## Recap
+# ## Summary
 # * Spatio-temporal fields are **compressible**: here 40 modes instead of 4,096 cells.
 # * POD gives the basis, DMD the spectral insight, and operator inference a fast predictive model.
 # * QR pivoting turns the basis into a **sensor-placement design** tool.
@@ -345,21 +330,3 @@ HTML(anim.to_jshtml())
 # physics (a new κ, a leak) moves the field off the training manifold, and detecting exactly that
 # is a job for the capstone (Chapter 6).
 #
-# ## Quick quiz
-# 1. 99% of the energy is in 10 modes. Does that guarantee 1% error on a *new* run?
-# 2. Why do QR-chosen sensors beat a regular grid for the same count?
-# 3. What does a DMD eigenvalue with $|\lambda| < 1$ and a nonzero angle mean physically?
-#
-# <details><summary>Answers</summary>
-#
-# 1. No. The energy is measured on the training data; a run unlike them (new physics, new source)
-#    can fall outside the basis.
-# 2. QR puts sensors where the modes are most distinguishable from one another, so the inversion
-#    from readings to mode weights is well-conditioned.
-# 3. A pattern that rotates (oscillates) while it decays, like the swirl of the stirred tank.
-# </details>
-#
-# ## Exercises
-# 1. Raise Pe (κ = 1e-4). How many modes are now needed for 99% energy?
-# 2. Train the ROM on 10 trajectories instead of 40. What happens to the test error?
-# 3. In the warm-up, make the heater jump between two positions. How fast do the singular values decay now?

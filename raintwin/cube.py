@@ -38,7 +38,7 @@ class Cube:
         d = Path(cache) / network
         c = d / "cube"
         self._dir = c
-        self.times = pd.DatetimeIndex(np.load(c / "times.npy"))
+        self.times = pd.DatetimeIndex(np.load(c / "times.npy").astype("datetime64[ns]"))
         self.split = np.load(c / "split.npy")                      # 0 train, 1 validation, 2 test
         self.lat, self.lon = np.load(c / "lat.npy"), np.load(c / "lon.npy")
         i0, i1, j0, j1 = window or WINDOWS.get(network) or (0, self.lat.size, 0, self.lon.size)

@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 9 · Project: fixing the rain twin (OpenMRG, Gothenburg)
-# **Level: Expert** · ~30 min to read, 15 min to run (mostly the 500 m grid) · 2D · *Applied project, part 3*
+# 2D · about 15 min to run (mostly the 500 m grid) · *Rain twin, part 3*
 #
 # Chapter 8 ended with two losses. At the 10 held-out gauges, plain IDW of the links made a better
 # map of the rain *now* than the twin did (correlation 0.69 against 0.59). And for forecasts of

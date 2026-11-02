@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Chapter 5 · Physics-informed neural networks (PINNs): 1D and 2D twins
-# **Level: Expert** · ~60 min (training takes about 13 + 5 min on a laptop CPU) · 1D and 2D
+# 1D and 2D · training takes about 13 + 5 min on a laptop CPU
 #
 # Every twin so far had a **solver on a grid** at its heart. A PINN takes a different route: the
 # field itself is a neural network $u_\theta(x,t)$, a smooth function you can evaluate anywhere.
@@ -14,17 +14,7 @@
 # | **A** | 1D Burgers equation (a near-shock) | forward solve, diagnostics, find the viscosity from 10 sensors |
 # | **B** | 2D puff in a flowing channel | reconstruct the field, identify κ and the velocity, forecast, find the release point |
 #
-# **Prerequisites:** Chapters 1–3, and basic PyTorch (tensors, `.backward()`).
-#
-# ## Glossary
-# | Term | Meaning |
-# |---|---|
-# | **MLP** | multi-layer perceptron: layers of `linear → tanh`, a flexible smooth function |
-# | **automatic differentiation (autograd)** | exact derivatives of the network output with respect to its inputs, computed by the chain rule |
-# | **collocation points** | random points $(x,t)$ where we *ask* the network to satisfy the PDE |
-# | **residual** $\mathcal R$ | how badly the PDE is violated at a point: $u_t - (\dots)$ |
-# | **Adam / L-BFGS** | two optimisers: Adam is robust early on; L-BFGS polishes at the end |
-# | **spectral bias** | networks learn smooth features first and sharp ones last |
+# Builds on Chapters 1–3, and basic PyTorch (tensors, `.backward()`).
 #
 # The loss function is a weighted sum of "how wrong" each piece is:
 #
@@ -108,7 +98,7 @@ axes[2].legend()
 plt.show()
 
 # %% [markdown]
-# ✅ **Check:** $k$ climbs from 0.5 to about 1.5. That's the whole PINN recipe. The rest of the
+# $k$ climbs from 0.5 to about 1.5. That's the whole PINN recipe. The rest of the
 # chapter applies it to real PDEs, where it gets harder: shocks, many parameters, unknown
 # initial conditions.
 #
@@ -361,11 +351,6 @@ HTML(anim.to_jshtml())
 # naturally, but must be retrained or fine-tuned as new data arrive and has no built-in
 # uncertainty. Filters are sequential, cheap per step, and quantify uncertainty. Hybrids (PINN
 # surrogate + EnKF, or ensembles of PINNs) are an active research area.
-#
-# **Exercises**
-# 1. Remove the initial-condition loss in the inverse problem. Can the sensors alone pin down the solution?
-# 2. Add 6 sensors clustered within ±0.02 of the shock. Does $\nu$ become identifiable in the shock regime?
-# 3. Add residual-based adaptive refinement: every 500 iterations add 500 collocation points where $|\mathcal R|$ is largest.
 
 # %% [markdown]
 # ---
@@ -589,15 +574,10 @@ print(f"estimated release point ({xg[ix]:.3f}, {xg[iy]:.3f}), true ({X0}, {Y0})"
 #   strongly multiscale or turbulent fields remain hard.
 # * In operational twins, PINNs often serve as **offline calibrators or surrogates**, while fast filters
 #   (Chapters 3–4) do the real-time tracking. The capstone (Chapter 6) combines exactly these pieces.
-#
-# **Exercises**
-# 1. Use 3×3 probes. Which parameter degrades first?
-# 2. Extend the forecast window to $t=2$. Where does the error grow, and why?
-# 3. Train 5 PINNs with different seeds (a deep ensemble) and map the standard deviation of the field.
 
 # %% [markdown]
 # ---
-# # Chapter recap
+# # Summary
 # * A PINN = a network for the field + autograd for derivatives + a loss that mixes physics and data.
 # * Unknown constants become trainable numbers, so reconstruction and calibration happen in one training run.
 # * PINNs need **no grid and no initial condition**, but they are slow to train and sensitive to
@@ -614,14 +594,3 @@ print(f"estimated release point ({xg[ix]:.3f}, {xg[iy]:.3f}), true ({X0}, {Y0})"
 # | you need a smooth, differentiable field | you need speed and robustness |
 # | it's an offline analysis | it's a live, real-time twin |
 #
-# ## Quick quiz
-# 1. Why does the 1D PINN need L-BFGS after Adam?
-# 2. The PDE loss is tiny but the field is wrong. Name two possible causes.
-#
-# <details><summary>Answers</summary>
-#
-# 1. Adam gets close but jitters; L-BFGS uses curvature information to converge much more precisely
-#    near the minimum.
-# 2. Too few collocation points where the action happens (the shock), or a data or initial-condition
-#    weight that is too small, so the network found a different solution of the same PDE.
-# </details>
